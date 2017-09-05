@@ -1,5 +1,6 @@
 import sys
 import sqlite3
+import database
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QLineEdit, QListWidget,
                              QPushButton, QTextEdit, QWidget)
 
@@ -155,6 +156,8 @@ class MainWindow(QWidget):
 if __name__ == '__main__':
 
     sample_db = sqlite3.connect('sample_database.db')
+    cursor = sample_db.cursor()
+    database.create_table(cursor)
 
     SAMPLES = SampleLibrary()
     app = QApplication(sys.argv)
