@@ -4,6 +4,7 @@ import database
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QLabel, QLineEdit, QListWidget,
                              QPushButton, QTextEdit, QWidget)
 
+DATABASE_NAME = 'sample_database.db'
 
 # GUI design and functionality for the "Add New Sample" dialog
 class AddSampleDialog(QWidget):
@@ -45,10 +46,12 @@ class AddSampleDialog(QWidget):
         self.setWindowTitle('Add New Sample')
         self.show()
 
-    # appends the new sample information to the sample library
+    # appends the new sample information to the sample library and database
     def createSample(self):
         if self.SAMPLE_NAME.text():
             SAMPLES.addSample(self.SAMPLE_NAME.text(), self.CHEMICAL_NAME.text(), self.SAMPLE_NOTES.toPlainText())
+            database.addSampleToDatabase(sample_db, cursor, self.SAMPLE_NAME.text(), self.CHEMICAL_NAME.text(),
+                                         self.SAMPLE_NOTES.toPlainText())
             self.sendSampleToMainWindow(self.SAMPLE_NAME.text())
             self.close()
 
@@ -135,7 +138,6 @@ class MainWindow(QWidget):
         else:
             SAMPLES.sample_library[current_sample]['notes'] = self.SAMPLE_NOTES.toPlainText()
 
-
     # populate the properties of the sample in the widgets when the sample name is clicked
     def getSampleProperties(self):
         if self.sender() == self.SAMPLES_LIST:
@@ -155,13 +157,15 @@ class MainWindow(QWidget):
 
 if __name__ == '__main__':
 
-    sample_db = sqlite3.connect('sample_database.db')
+    sample_db = sqlite3.connect(DATABASE_NAME)
     cursor = sample_db.cursor()
-    database.create_table(cursor)
+    database.createTable(cursor)
 
     SAMPLES = SampleLibrary()
     app = QApplication(sys.argv)
     main_window = MainWindow()
+
+    # TODO: figure out how to simultaneously close db connection
     sys.exit(app.exec_())
 
 
