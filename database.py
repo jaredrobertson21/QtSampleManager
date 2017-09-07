@@ -14,3 +14,9 @@ def addSampleToDatabase(db, cursor, name, chemical, notes):
 def createTable(cursor):
     cursor.execute('CREATE TABLE IF NOT EXISTS sample_table(datestamp text, sample_name text, \
                     chemical_name text, sample_notes text)')
+
+
+def getAllData(cursor):
+    cursor.execute('SELECT sample_name, chemical_name, sample_notes FROM sample_table')
+    data = cursor.fetchall()
+    return data

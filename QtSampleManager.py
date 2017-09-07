@@ -161,6 +161,10 @@ if __name__ == '__main__':
     cursor = sample_db.cursor()
     database.createTable(cursor)
 
+    # TODO: get all sample data from database
+    data = database.getAllData(cursor)
+    print(data)
+
     SAMPLES = SampleLibrary()
     app = QApplication(sys.argv)
     main_window = MainWindow()
