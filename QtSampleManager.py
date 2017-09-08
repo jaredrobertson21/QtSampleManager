@@ -55,17 +55,19 @@ class AddSampleDialog(QWidget):
             self.sendSampleToMainWindow(self.SAMPLE_NAME.text())
             self.close()
 
-    # sends the new sample to be added to the main window
+    # sends the new sample to be added to the main window list widget
     def sendSampleToMainWindow(self, sample):
         main_window.addSample(sample)
 
 
+# defines the object that contains all sample information
 class SampleLibrary(dict):
 
     def __init__(self):
         super().__init__()
         self.sample_library = {}
 
+    # adds a sample and its properties to a JSON-style object
     def addSample(self, name, chemical, notes):
         self.sample_library[name] = {
             'chemical': chemical,
@@ -118,6 +120,7 @@ class MainWindow(QWidget):
         self.setWindowTitle('Sample Manager')
         self.show()
 
+    # adds the sample name to the main window list widget
     def addSample(self, sample):
         self.SAMPLES_LIST.addItem(sample)
 
@@ -146,10 +149,11 @@ class MainWindow(QWidget):
             self.CHEMICAL_NAME.setText(sample_properties['chemical'])
             self.SAMPLE_NOTES.setText(sample_properties['notes'])
 
+    # Create the 'Add sample' dialog - the window where samples can be added
     def showAddSampleDialog(self):
         self.AddSampleDialog = AddSampleDialog()
 
-
+    # closes the 'Add sample' dialog when the main window is closed
     def closeEvent(self, QCloseEvent):
         if hasattr(self, 'AddSampleDialog'):
             self.AddSampleDialog.close()
@@ -160,14 +164,17 @@ if __name__ == '__main__':
     sample_db = sqlite3.connect(DATABASE_NAME)
     cursor = sample_db.cursor()
     database.createTable(cursor)
-
-    # TODO: get all sample data from database
     data = database.getAllData(cursor)
-    print(data)
 
+    # instantiate all major objects; SAMPLES contains all stored samples
     SAMPLES = SampleLibrary()
     app = QApplication(sys.argv)
     main_window = MainWindow()
+
+    # load samples from database into SAMPLES object and main window
+    for sample in data:
+        SAMPLES.addSample(sample[0], sample[1], sample[2])
+        main_window.addSample(sample[0])
 
     # TODO: figure out how to simultaneously close db connection
     sys.exit(app.exec_())
