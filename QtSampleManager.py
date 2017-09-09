@@ -137,6 +137,7 @@ class MainWindow(QWidget):
         if len(selected_sample) == 1:
             # if a sample is highlighted, delete from the database and sample list
             SAMPLES.deleteSample(selected_sample[0].text())
+            database.deleteSample(cursor, selected_sample[0].text())
             self.SAMPLES_LIST.takeItem(self.SAMPLES_LIST.currentRow())
 
 

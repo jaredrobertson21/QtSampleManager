@@ -23,7 +23,7 @@ def createTable(cursor):
 # TODO: incomplete
 def deleteSample(cursor, sample):
     cursor.execute('DELETE FROM sample_table \
-                    WHERE ')
+                    WHERE sample_name = (?)', sample)
 
 
 # returns all sample data from the database
