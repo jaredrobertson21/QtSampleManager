@@ -47,6 +47,7 @@ class AddSampleDialog(QWidget):
         self.show()
 
     # appends the new sample information to the sample library and database
+    # TODO: don't allow multiple samples with the same name to be added
     def createSample(self):
         if self.SAMPLE_NAME.text():
             SAMPLES.addSample(self.SAMPLE_NAME.text(), self.CHEMICAL_NAME.text(), self.SAMPLE_NOTES.toPlainText())
@@ -76,6 +77,9 @@ class SampleLibrary(dict):
 
         return self.sample_library
 
+    def deleteSample(self, name):
+        self.sample_library.pop(name)
+
 
 # GUI design and functionality for the main window
 class MainWindow(QWidget):
@@ -89,6 +93,7 @@ class MainWindow(QWidget):
 
         # instantiate all GUI objects
         self.NEW_SAMPLE_BUTTON = QPushButton('New Sample')
+        self.DELETE_SAMPLE_BUTTON = QPushButton('Delete Sample')
         self.SAMPLES_LIST = QListWidget()
         self.SAMPLE_NAME = QLineEdit()
         self.CHEMICAL_NAME = QLineEdit()
@@ -103,14 +108,16 @@ class MainWindow(QWidget):
         grid.addWidget(self.LABEL_SAMPLE_NAME, 1, 2)
         grid.addWidget(self.SAMPLE_NAME, 1, 3)
         grid.addWidget(self.NEW_SAMPLE_BUTTON, 4, 1)
+        grid.addWidget(self.DELETE_SAMPLE_BUTTON, 5, 1)
         grid.addWidget(self.LABEL_CHEMICAL_NAME, 2, 2)
         grid.addWidget(self.CHEMICAL_NAME, 2, 3)
         grid.addWidget(self.LABEL_SAMPLE_NOTES, 3, 2)
-        grid.addWidget(self.SAMPLE_NOTES, 3, 3, 2, 1)
+        grid.addWidget(self.SAMPLE_NOTES, 3, 3, 3, 1)
 
         self.setLayout(grid)
 
         self.NEW_SAMPLE_BUTTON.clicked.connect(self.showAddSampleDialog)
+        self.DELETE_SAMPLE_BUTTON.clicked.connect(self.deleteSample)
         self.SAMPLES_LIST.itemClicked.connect(self.getSampleProperties)
         self.SAMPLE_NAME.textEdited.connect(self.editProperty)
         self.CHEMICAL_NAME.textEdited.connect(self.editProperty)
@@ -123,6 +130,15 @@ class MainWindow(QWidget):
     # adds the sample name to the main window list widget
     def addSample(self, sample):
         self.SAMPLES_LIST.addItem(sample)
+
+
+    def deleteSample(self):
+        selected_sample = self.SAMPLES_LIST.selectedItems()
+        if len(selected_sample) == 1:
+            # if a sample is highlighted, delete from the database and sample list
+            SAMPLES.deleteSample(selected_sample[0].text())
+            self.SAMPLES_LIST.takeItem(self.SAMPLES_LIST.currentRow())
+
 
     # TODO: update method to handle changes to the notes without having notes update
     # TODO: each time a new sample is clicked
